@@ -1,0 +1,334 @@
+{block content}
+<div ng-app="questionnaire"
+    ng-controller="QuestionnaireBasicCtrl">
+
+    {* progress bar *}
+    <div class="navbar navbar-fixed-top navbar-default">
+        <div class="container">
+            <h4><span ng-bind="completePercentage()|round"></span>% Complete</h4>
+            <div class="progress">
+                <div class="progress-bar"
+                     ng-class="{
+                            'progress-bar-warning': completePercentage() < 30,
+                            'progress-bar-info': completePercentage() >= 30 && completePercentage() < 50,
+                            'progress-bar-success': completePercentage() >= 50
+                         }"
+                     role="progressbar" aria-valuenow="{{ completePercentage() }}"
+                     aria-valuemin="0" aria-valuemax="100"
+                     style="width: {{ completePercentage() }}%">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container questionnaire">
+        <h1>Krátký dotazník na zaměstnání</h1>
+
+        <form class="form" role="form">
+            {* Krok 1 *}
+            <div class="container well step1" ng-show="showStep(1)">
+                <h2>Krok 1 <small>Firma</small></h2>
+                {* obor *}
+                <div class="form-group clearfix">
+                    <label class="sector control-label col-sm-2" for="sector-field">
+                        Obor působení:
+                    </label>
+                    <div class="col-sm-10">
+                        <select id="sector-field"
+                                class="field form-control"
+                                ng-required="true"
+                                ng-model="questionnaire.sector"
+                                ng-options="sector.label for sector in sectors">
+                            <option value="">--- vyberte obor ---</option>
+                        </select>
+                    </div>
+                </div>
+
+                {* název firmy *}
+                <div class="form-group clearfix">
+                    <label class="company_name control-label col-sm-2" for="company_name-field">
+                        Název firmy:
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="company_name-field"
+                               type="text"
+                               class="field form-control"
+                               placeholder="př.: Vysoká škola ekonomická"
+                               ng-required="true"
+                               ng-model="questionnaire.company_name" />
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    {* IČ firmy *}
+                    <label class="company_ic control-label col-sm-2" for="company_ic-field">
+                        IČ firmy:
+                    </label>
+                    <div class="col-sm-4">
+                        <input id="company_ic-field"
+                               type="text"
+                               class="field form-control"
+                               placeholder="př.: 11223344"
+                               ng-required="true"
+                               ng-model="questionnaire.company_ic" />
+                    </div>
+
+                    {* velikost firmy *}
+                    <label class="company_size control-label col-sm-2" for="company_size-field">
+                        Velikost firmy:
+                    </label>
+                    <div class="col-sm-4">
+                        <select id="company_size-field"
+                                class="field form-control"
+                                ng-required="true"
+                                ng-model="questionnaire.company_size"
+                                ng-options="size.label for size in company_sizes">
+                            <option value="">--- vyberte velikost ---</option>
+                        </select>
+                    </div>
+                </div>
+
+                {* sídlo firmy *}
+                <div class="form-group clearfix">
+                    {* Ulice *}
+                    <label class="company_address_street control-label col-sm-2" for="company_address_street-field">
+                        Ulice:
+                    </label>
+                    <div class="col-sm-2">
+                        <input id="company_address_street-field"
+                               type="text"
+                               class="field form-control"
+                               placeholder="př.: nám. W. Churchilla"
+                               ng-required="true"
+                               ng-model="questionnaire.company_address_street" />
+                    </div>
+
+                    {* Město *}
+                    <label class="company_address_city control-label col-sm-2" for="company_address_city-field">
+                        Město:
+                    </label>
+                    <div class="col-sm-2">
+                        <input id="company_address_city-field"
+                               type="text"
+                               class="field form-control"
+                               placeholder="př.: Praha"
+                               ng-required="true"
+                               ng-model="questionnaire.company_address_city" />
+                    </div>
+
+                    {* PSČ *}
+                    <label class="company_address_postcode control-label col-sm-2" for="company_address_postcode-field">
+                        PSČ:
+                    </label>
+                    <div class="col-sm-2">
+                        <input id="company_address_postcode-field"
+                               type="text"
+                               class="field form-control"
+                               placeholder="př.: 13063"
+                               ng-required="true"
+                               ng-model="questionnaire.company_address_postcode" />
+                    </div>
+                </div>
+
+            </div>
+            <div class="clearfix"></div>
+
+            {* Krok 2 *}
+            <div class="container well step2" ng-show="showStep(2)">
+                <h2>Krok 2 <small>O vás</small></h2>
+                {* xname *}
+                <div class="form-group clearfix">
+                    <label class="xname control-label col-sm-2" for="xname-field">
+                        xname:
+                    </label>
+                    <div class="col-sm-10">
+                        <input id="xname-field"
+                               type="text"
+                               class="field form-control"
+                               placeholder="př.: xnovj00"
+                               ng-required="true"
+                               ng-model="questionnaire.xname" />
+                    </div>
+                </div>
+
+                {* pracovní údaje *}
+                <div class="form-group clearfix">
+                    {* Intenzita práce *}
+                    <label class="work_intensity control-label col-sm-2" for="work_intensity-field">
+                        Kolik hodin týdně pracujete:
+                    </label>
+                    <div class="col-sm-2">
+                        <input id="work_intensity-field"
+                               type="number"
+                               class="field form-control"
+                               placeholder="př.: 20"
+                               ng-required="true"
+                               ng-model="questionnaire.work_intensity" />
+                    </div>
+
+                    {* Doba práce v měsících *}
+                    <label class="work_duration control-label col-sm-2" for="work_duration-field">
+                        Jak dlouho zde pracujete:
+                    </label>
+                    <div class="col-sm-2">
+                        <select id="work_duration-field"
+                                class="field form-control"
+                                ng-required="true"
+                                ng-model="questionnaire.work_duration"
+                                ng-options="work_duration.label for work_duration in work_durations">
+                            <option value="">--- vyberte dobu ---</option>
+                        </select>
+                    </div>
+
+                    {* Doba práce v měsících *}
+                    <label class="work_position control-label col-sm-2" for="work_position-field">
+                        Jakou pozici zastáváte:
+                    </label>
+                    <div class="col-sm-2">
+                        <input id="work_position-field"
+                               type="text"
+                               class="field form-control"
+                               placeholder="př.: programátor"
+                               ng-required="true"
+                               ng-model="questionnaire.work_position" />
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+
+            {* Krok 3 *}
+            <div class="container well step3" ng-show="showStep(3)">
+                <h2>Krok 3 <small>Kontaktní informace</small></h2>
+
+                {* manažer *}
+                <div class="form-group clearfix">
+                    {* Iniciále *}
+                    <label class="manager_position control-label col-sm-2" for="manager_position-field">
+                        Manažer:
+                    </label>
+                    <label class="manager_firstname control-label col-sm-2" for="manager_firstname-field">
+                        Jméno, příjmení, titul:
+                    </label>
+                    <div class="col-sm-3">
+                        <input id="manager_firstname-field"
+                               type="text"
+                               placeholder="Jméno"
+                               class="field form-control"
+                               ng-model="questionnaire.manager_firstname" />
+                    </div>
+                    <div class="col-sm-3">
+                        <input id="manager_lastname-field"
+                               type="text"
+                               placeholder="Příjmení"
+                               class="field form-control"
+                               ng-model="questionnaire.manager_lastname" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input id="manager_academy_title-field"
+                               type="text"
+                               placeholder="Titul"
+                               class="field form-control"
+                               ng-model="questionnaire.manager_academy_title" />
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    {* Firemní údaje manažera *}
+                    <label class="control-label col-sm-2">
+                    </label>
+                    <label class="manager_position control-label col-sm-2" for="manager_position-field">
+                        Pozice:
+                    </label>
+                    <div class="col-sm-3">
+                        <input id="manager_position-field"
+                               type="text"
+                               placeholder="př.: CIO"
+                               class="field form-control"
+                               ng-model="questionnaire.manager_position" />
+                    </div>
+                    <label class="manager_phone control-label col-sm-2" for="manager_phone-field">
+                        Telefon.:
+                    </label>
+                    <div class="col-sm-3">
+                        <input id="manager_phone-field"
+                               type="text"
+                               placeholder="př.: 777222111"
+                               class="field form-control"
+                               ng-model="questionnaire.manager_phone" />
+                    </div>
+                </div>
+
+
+                {* vývojář *}
+                <div class="form-group clearfix">
+                    {* Iniciále *}
+                    <label class="developer_position control-label col-sm-2" for="developer_position-field">
+                        Hlavní vývojář:
+                    </label>
+                    <label class="developer_firstname control-label col-sm-2" for="developer_firstname-field">
+                        Jméno, příjmení, titul:
+                    </label>
+                    <div class="col-sm-3">
+                        <input id="developer_firstname-field"
+                               type="text"
+                               placeholder="Jméno"
+                               class="field form-control"
+                               ng-model="questionnaire.developer_firstname" />
+                    </div>
+                    <div class="col-sm-3">
+                        <input id="developer_lastname-field"
+                               type="text"
+                               placeholder="Příjmení"
+                               class="field form-control"
+                               ng-model="questionnaire.developer_lastname" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input id="developer_academy_title-field"
+                               type="text"
+                               placeholder="Titul"
+                               class="field form-control"
+                               ng-model="questionnaire.developer_academy_title" />
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    {* Firemní údaje manažera *}
+                    <label class="control-label col-sm-2">
+                    </label>
+                    <label class="developer_position control-label col-sm-2" for="developer_position-field">
+                        Pozice:
+                    </label>
+                    <div class="col-sm-3">
+                        <input id="developer_position-field"
+                               type="text"
+                               placeholder="př.: Hlavní programátor"
+                               class="field form-control"
+                               ng-model="questionnaire.developer_position" />
+                    </div>
+                    <label class="developer_phone control-label col-sm-2" for="developer_phone-field">
+                        Telefon.:
+                    </label>
+                    <div class="col-sm-3">
+                        <input id="developer_phone-field"
+                               type="text"
+                               placeholder="př.: 222333444"
+                               class="field form-control"
+                               ng-model="questionnaire.developer_phone" />
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+
+            {* Potvrzení *}
+            <div class="container well step4" ng-show="showStep(4)">
+                <div class="form-group">
+                    <h3>Nyní můžete formulář uložit</h3>
+                    <button class="btn btn-success">Odeslat</button>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+
+</div>
+{/block}
