@@ -28,6 +28,7 @@ common:
 		authenticator: Authenticator
 		routerFactory: RouterFactory
 		router: @routerFactory::createRouter
+		questionnaireModel: app\model\QuestionnaireModel
 
 
 	factories:

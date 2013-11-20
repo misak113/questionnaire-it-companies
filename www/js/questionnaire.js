@@ -7,7 +7,11 @@ questionnaire.filter('round', function () {
     };
 });
 
-function QuestionnaireBasicCtrl($scope) {
+function QuestionnaireBasicCtrl($scope, $http) {
+    // urls
+    $scope.saveUrl = '/';
+    $scope.storeUrl = '/';
+
     // form fields
     $scope.questionnaire = {
         sector: '',
@@ -105,10 +109,29 @@ function QuestionnaireBasicCtrl($scope) {
     };
 
     $scope.store = function () {
-
+        var data = {
+            'questionnaire': $scope.questionnaire
+        };
+        $http.post($scope.storeUrl, data).success(function (resp) {
+            console.log(resp);
+        });
     };
 
     $scope.save = function () {
-
+        var data = {
+            'questionnaire': $scope.questionnaire
+        };
+        $http.post($scope.saveUrl, data).success(function (resp) {
+            console.log(resp);
+        })
+            .error(function (resp) {
+                console.log(resp);
+            });
     };
+
+    $scope.$watch('questionnaire', function(newValue, oldValue) {
+        console.log(newValue);
+        console.log(oldValue);
+        $scope.store();
+    }, true);
 }
