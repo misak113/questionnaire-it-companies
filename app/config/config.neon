@@ -29,6 +29,10 @@ common:
 		routerFactory: RouterFactory
 		router: @routerFactory::createRouter
 		questionnaireModel: app\model\QuestionnaireModel
+		aresModel:
+			class: app\model\AresModel
+			setup:
+				- setCache(%tempDir%)
 
 
 	factories:

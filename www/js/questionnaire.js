@@ -73,9 +73,10 @@ function QuestionnaireBasicCtrl($scope, $http) {
     ];
 
     $scope.company_sizes = [
-        { label: 'Malá', value: 1 },
-        { label: 'Střední', value: 2 },
-        { label: 'Velká', value: 3 }
+        { label: 'Drobné (do 9 zaměstnanců)', value: 1 },
+        { label: 'Malá (10 až 49 zaměstnanců)', value: 2 },
+        { label: 'Střední (50 až 249 zaměstnanců)', value: 3 },
+        { label: 'Velká (od 250 zaměstnanců)', value: 4 }
     ];
 
     $scope.work_durations = [
@@ -178,6 +179,8 @@ function QuestionnaireBasicCtrl($scope, $http) {
         $scope.whisperer[type] = [];
     };
 
+
+    // whisper
     $scope.whisperer = {};
     $scope.whisper = function (type, model) {
         if (typeof model === 'undefined' || !model || !$scope.whisperAllowed[type])
@@ -189,8 +192,10 @@ function QuestionnaireBasicCtrl($scope, $http) {
             model: model
         })
             .success(function (resp) {
-                if (!$scope.whisperAllowed[type])
-                    return $scope.whisperer[type] = [];
+                if (!$scope.whisperAllowed[type]) {
+                    $scope.whisperer[type] = [];
+                    return;
+                }
                 $scope.whisperer[type] = resp.whisperer;
             })
             .error(function (resp) {

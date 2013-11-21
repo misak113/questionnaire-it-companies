@@ -7,6 +7,8 @@ class HomepagePresenter extends BasePresenter
 {
     /** @var \app\model\QuestionnaireModel @inject */
     public $questionnaireModel;
+    /** @var \app\model\AresModel @inject */
+    public $aresModel;
 
     public function handleStore() {
         $post = $this->getRawPost();
@@ -31,7 +33,7 @@ class HomepagePresenter extends BasePresenter
     public function handleWhisperCompanies() {
         $post = $this->getRawPost();
         $model = isset($post['model']) ?$post['model'] :'';
-        $companies = $this->questionnaireModel->getCompaniesByName($model);
+        $companies = $this->aresModel->getCompaniesByName($model);
         $this->sendJson(array(
             'whisperer' => $companies
         ));

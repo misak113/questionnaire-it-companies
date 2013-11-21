@@ -35,7 +35,7 @@ class QuestionnaireModel {
         return $questionnaire;
     }
 
-    public function getCompaniesByName($name) {return array(array('name' => 'Zapakatel', 'ic' => '342423'));
+    public function getCompaniesByName($name) {
         $companies = $this->selectionFactory->table('company')
             ->where('LOWER(name) LIKE ?', '%'.strtolower($name).'%')
             ->fetchAll();
