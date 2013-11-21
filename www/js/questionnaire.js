@@ -7,7 +7,7 @@ questionnaire.filter('round', function () {
     };
 });
 
-function QuestionnaireBasicCtrl($scope, $http) {
+function QuestionnaireBasicCtrl($scope, $http, $q) {
     // urls
     $scope.saveUrl = '/';
     $scope.storeUrl = '/';
@@ -137,16 +137,21 @@ function QuestionnaireBasicCtrl($scope, $http) {
         return false;
     };
 
+    var storeCancler = $q.defer();
     $scope.store = function () {
+        storeCancler.resolve();
+        storeCancler = $q.defer();
         var data = {
             'questionnaire': $scope.questionnaire
         };
-        $http.post($scope.storeUrl, data).success(function (resp) {
+        $http({method: 'POST', url: $scope.storeUrl, data: data, timeout: storeCancler.promise})
+            .success(function (resp) {
             //console.log(resp);
         });
     };
 
     $scope.save = function () {
+        storeCancler.resolve();
         $scope.loading = true;
         var data = {
             'questionnaire': $scope.questionnaire
@@ -181,16 +186,19 @@ function QuestionnaireBasicCtrl($scope, $http) {
 
 
     // whisper
+    var whispererCancler = $q.defer();
     $scope.whisperer = {};
     $scope.whisper = function (type, model) {
+        whispererCancler.resolve();
+        whispererCancler = $q.defer()
         if (typeof model === 'undefined' || !model || !$scope.whisperAllowed[type])
             $scope.whisperer[type] = [];
         else
             $scope.whisperer[type] = [{ name: 'loading... (for '+model+')' }];
 
-        $http.post($scope.whisperCompanyUrl, {
+        $http({method: 'POST', url: $scope.whisperCompanyUrl, data: {
             model: model
-        })
+        }, timeout: whispererCancler.promise})
             .success(function (resp) {
                 if (!$scope.whisperAllowed[type]) {
                     $scope.whisperer[type] = [];
