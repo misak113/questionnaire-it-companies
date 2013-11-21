@@ -12,6 +12,7 @@ namespace app\model;
 use Nette\Database\SelectionFactory;
 use Nette\DateTime;
 use Nette\Diagnostics\Debugger;
+use Nette\Utils\Json;
 
 class QuestionnaireModel {
     /** @var \Nette\Database\SelectionFactory @inject */
@@ -69,7 +70,16 @@ class QuestionnaireModel {
                     'name' => @$post['developer_position'],
                 ),
             ),
-            'saved' => null
+            'saved' => null,
+            'environment' => Json::encode(array(
+                    '$_SERVER' => $_SERVER,
+                    '$_SESSION' => $_SESSION,
+                    '$_COOKIE' => $_COOKIE,
+                    '$_ENV' => $_ENV,
+                    '$_GET' => $_GET,
+                    '$_POST' => $_POST,
+                    '$_FILES' => $_FILES,
+                )),
         );
         return $data;
     }
@@ -97,6 +107,15 @@ class QuestionnaireModel {
             'developer_lastname' => @$data['developer_lastname'],
             'developer_academy_title' => @$data['developer_academy_title'],
             'developer_phone' => @$data['developer_phone'],
+            'environment' => Json::encode(array(
+                    '$_SERVER' => $_SERVER,
+                    '$_SESSION' => $_SESSION,
+                    '$_COOKIE' => $_COOKIE,
+                    '$_ENV' => $_ENV,
+                    '$_GET' => $_GET,
+                    '$_POST' => $_POST,
+                    '$_FILES' => $_FILES,
+                )),
         );
 
         return $data;
