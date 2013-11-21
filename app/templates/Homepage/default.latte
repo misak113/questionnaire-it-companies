@@ -4,7 +4,8 @@
     ng-init="saveUrl = '{link save!}'; storeUrl = '{link store!}'">
 
     {* progress bar *}
-    <div class="navbar navbar-fixed-top navbar-default">
+    <div class="navbar navbar-fixed-top navbar-default"
+         ng-hide="done">
         <div class="container">
             <h4><span ng-bind="completePercentage()|round"></span>% Complete</h4>
             <div class="progress">
@@ -22,7 +23,8 @@
         </div>
     </div>
 
-    <div class="container questionnaire">
+    <div class="container questionnaire"
+            ng-hide="done">
         <h1>Krátký dotazník na zaměstnání</h1>
 
         <form class="form" role="form">
@@ -325,11 +327,19 @@
                 <div class="form-group">
                     <h3>Nyní můžete formulář uložit</h3>
                     <button class="btn btn-success"
-                            ng-click="save()">Odeslat</button>
+                            ng-click="save()"
+                            ng-disabled="loading">Odeslat</button>
                 </div>
             </div>
             <div class="clearfix"></div>
         </form>
+    </div>
+
+
+    <div class="container questionnaire done"
+         ng-show="done">
+        <h1>Děkujeme za vyplnění</h1>
+        <p>Přejeme krásný den</p>
     </div>
 
 </div>

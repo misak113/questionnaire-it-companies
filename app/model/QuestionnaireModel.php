@@ -149,7 +149,7 @@ class QuestionnaireModel {
         $data['company_id'] = $company['company_id'];
 
         // questionnaire
-        $questionnaire = $this->insertOrUpdate('questionnaire', array('uid' => $uid), $data);
+        $questionnaire = $this->insertOrUpdate('questionnaire', array('uid' => $uid, 'saved IS NULL'), $data);
 
         return $questionnaire;
     }
@@ -182,6 +182,9 @@ class QuestionnaireModel {
         $table = $this->selectionFactory->table($tableName);
         if (!$row) {
             $data = $keys + $data;
+            foreach ($data as $key => $val)
+                if (is_int($key))
+                    unset($data[$key]);
             try {
                 $row = $table
                     ->insert($data);
