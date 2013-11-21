@@ -19,21 +19,57 @@ class QuestionnaireModel {
 
     public function store($uid, $post) {
         $data = $this->prepareData($post);
-        $this->log($uid, $post);
         $questionnaire = $this->insertOrUpdate($uid, $data);
+        $this->log($uid, $post);
         return $questionnaire;
     }
 
     public function save($uid, $post) {
         $data = $this->prepareData($post);
         $data['saved'] = new DateTime();
-        $this->log($uid, $post);
         $questionnaire = $this->insertOrUpdate($uid, $data);
+        $this->log($uid, $post);
         return $questionnaire;
     }
 
     protected function prepareData($post) {
-        return $post;
+        $data = array(
+            'sector' => @$post['sector'],
+            'xname' => @$post['xname'],
+            'work_intensity' => @$post['work_intensity'],
+            'work_duration' => @$post['work_duration'],
+            'work_position' => array(
+                'name' => @$post['work_position'],
+            ),
+            'company' => array(
+                'name' => @$post['name'],
+                'ic' => @$post['ic'],
+                'size' => @$post['size'],
+                'address_street' => @$post['address_street'],
+                'address_city' => @$post['address_city'],
+                'address_postcode' => @$post['address_postcode'],
+            ),
+            'manager_person' => array(
+                'firstname' => @$post['manager_firtname'],
+                'lastname' => @$post['manager_lastname'],
+                'academy_title' => @$post['manager_academy_title'],
+                'phone' => @$post['manager_phone'],
+                'position' => array(
+                    'name' => @$post['manager_position'],
+                ),
+            ),
+            'developer_person' => array(
+                'firstname' => @$post['developer_firtname'],
+                'lastname' => @$post['developer_lastname'],
+                'academy_title' => @$post['developer_academy_title'],
+                'phone' => @$post['developer_phone'],
+                'position' => array(
+                    'name' => @$post['developer_position'],
+                ),
+            ),
+            'saved' => null
+        );
+        return $data;
     }
 
     protected function prepareLogData($data) {
@@ -60,6 +96,7 @@ class QuestionnaireModel {
             'developer_academy_title' => @$data['developer_academy_title'],
             'developer_phone' => @$data['developer_phone'],
         );
+
         return $data;
     }
 
@@ -79,7 +116,10 @@ class QuestionnaireModel {
     }
 
     protected function insertOrUpdate($uid, $data) {
-        $questionnaire = $this->table()->where('uid = ?', $uid)->fetch();
+        $questionnaire = $this->table()
+            ->where('uid = ?', $uid)
+            ->where('saved IS NULL')
+            ->fetch();
         if (!$questionnaire) {
             $data['uid'] = $uid;
             try {
