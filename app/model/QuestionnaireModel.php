@@ -19,38 +19,40 @@ class QuestionnaireModel {
 
     public function store($uid, $post) {
         $data = $this->prepareData($post);
-        $questionnaire = $this->insertOrUpdate($uid, $data);
+        $questionnaire = $this->updateQuestionnaire($uid, $data);
         $this->log($uid, $post);
+        $this->cleanup();
         return $questionnaire;
     }
 
     public function save($uid, $post) {
         $data = $this->prepareData($post);
         $data['saved'] = new DateTime();
-        $questionnaire = $this->insertOrUpdate($uid, $data);
+        $questionnaire = $this->updateQuestionnaire($uid, $data);
         $this->log($uid, $post);
+        $this->cleanup();
         return $questionnaire;
     }
 
     protected function prepareData($post) {
         $data = array(
-            'sector' => @$post['sector'],
+            'sector' => @$post['sector']['value'],
             'xname' => @$post['xname'],
             'work_intensity' => @$post['work_intensity'],
-            'work_duration' => @$post['work_duration'],
+            'work_duration' => @$post['work_duration']['value'],
             'work_position' => array(
                 'name' => @$post['work_position'],
             ),
             'company' => array(
-                'name' => @$post['name'],
-                'ic' => @$post['ic'],
-                'size' => @$post['size'],
-                'address_street' => @$post['address_street'],
-                'address_city' => @$post['address_city'],
-                'address_postcode' => @$post['address_postcode'],
+                'name' => @$post['company_name'],
+                'ic' => @$post['company_ic'],
+                'size' => @$post['company_size']['value'],
+                'address_street' => @$post['company_address_street'],
+                'address_city' => @$post['company_address_city'],
+                'address_postcode' => @$post['company_address_postcode'],
             ),
-            'manager_person' => array(
-                'firstname' => @$post['manager_firtname'],
+            'manager' => array(
+                'firstname' => @$post['manager_firstname'],
                 'lastname' => @$post['manager_lastname'],
                 'academy_title' => @$post['manager_academy_title'],
                 'phone' => @$post['manager_phone'],
@@ -58,8 +60,8 @@ class QuestionnaireModel {
                     'name' => @$post['manager_position'],
                 ),
             ),
-            'developer_person' => array(
-                'firstname' => @$post['developer_firtname'],
+            'developer' => array(
+                'firstname' => @$post['developer_firstname'],
                 'lastname' => @$post['developer_lastname'],
                 'academy_title' => @$post['developer_academy_title'],
                 'phone' => @$post['developer_phone'],
@@ -100,6 +102,43 @@ class QuestionnaireModel {
         return $data;
     }
 
+    protected function updateQuestionnaire($uid, $data) {
+        // work_position
+        $work_position = $this->insertOrUpdate('position', $data['work_position'], $data['work_position']);
+        unset($data['work_position']);
+        $data['work_position_id'] = $work_position['position_id'];
+
+        // manager
+        $manager_position = $this->insertOrUpdate('position', $data['manager']['position'], $data['manager']['position']);
+        unset($data['manager']['position']);
+        $data['manager']['position_id'] = $manager_position['position_id'];
+        $manager = $this->insertOrUpdate('person', $data['manager'], $data['manager']);
+        unset($data['manager']);
+        $data['manager_person_id'] = $manager['person_id'];
+
+        // developer
+        $developer_position = $this->insertOrUpdate('position', $data['developer']['position'], $data['developer']['position']);
+        unset($data['developer']['position']);
+        $data['developer']['position_id'] = $developer_position['position_id'];
+        $developer = $this->insertOrUpdate('person', $data['developer'], $data['developer']);
+        unset($data['developer']);
+        $data['developer_person_id'] = $developer['person_id'];
+
+        // company
+        $company = $this->insertOrUpdate('company', $data['company'], $data['company']);
+        unset($data['company']);
+        $data['company_id'] = $company['company_id'];
+
+        // questionnaire
+        $questionnaire = $this->insertOrUpdate('questionnaire', array('uid' => $uid), $data);
+
+        return $questionnaire;
+    }
+
+    protected function cleanup() {
+        $this->selectionFactory->getConnection()->query('CALL cleanup();');
+    }
+
     protected function log($uid, $post) {
         $data = $this->prepareLogData($post);
         $data['uid'] = $uid;
@@ -115,15 +154,17 @@ class QuestionnaireModel {
         return $questionnaire;
     }
 
-    protected function insertOrUpdate($uid, $data) {
-        $questionnaire = $this->table()
-            ->where('uid = ?', $uid)
-            ->where('saved IS NULL')
+    protected function insertOrUpdate($tableName, $keys, $data) {
+        $table = $this->selectionFactory->table($tableName);
+        $row = $table
+            ->where($keys)
             ->fetch();
-        if (!$questionnaire) {
-            $data['uid'] = $uid;
+
+        $table = $this->selectionFactory->table($tableName);
+        if (!$row) {
+            $data = $keys + $data;
             try {
-                $questionnaire = $this->table()
+                $row = $table
                     ->insert($data);
             } catch (\PDOException $e) {
                 Debugger::log($e, Debugger::ERROR);
@@ -131,15 +172,15 @@ class QuestionnaireModel {
             }
         } else {
             try {
-                $questionnaire = $this->table()
-                    ->where('uid = ?', $uid)
+                $countRows = $table
+                    ->where($keys)
                     ->update($data);
             } catch (\PDOException $e) {
                 Debugger::log($e, Debugger::ERROR);
                 return null;
             }
         }
-        return $questionnaire;
+        return $row;
     }
 
     protected function table() {

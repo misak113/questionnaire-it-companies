@@ -14,12 +14,18 @@ class HomepagePresenter extends BasePresenter
             $this->sendJson(array('error' => 'bad post data'));
         }
         $uid = $this->getUid();
-        $this->questionnaireModel->store($uid, $post);
+        $this->questionnaireModel->store($uid, $post['questionnaire']);
         $this->sendJson($post);
     }
 
     public function handleSave() {
-
+        $post = $this->getRawPost();
+        if ($post === null) {
+            $this->sendJson(array('error' => 'bad post data'));
+        }
+        $uid = $this->getUid();
+        $this->questionnaireModel->save($uid, $post['questionnaire']);
+        $this->sendJson($post);
     }
 
     protected function getUid() {
