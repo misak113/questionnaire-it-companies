@@ -11,6 +11,7 @@ function QuestionnaireBasicCtrl($scope, $http) {
     // urls
     $scope.saveUrl = '/';
     $scope.storeUrl = '/';
+    $scope.whisperCompanyUrl = '/';
 
     $scope.loading = false;
     $scope.done = false;
@@ -43,8 +44,32 @@ function QuestionnaireBasicCtrl($scope, $http) {
 
 
     $scope.sectors = [
-        { label: 'Vývoj software', value: 1 },
-        { label: 'Finančnictví', value: 2 }
+        { label: 'IT - Vývoj krabicového software', value: 1 },
+        { label: 'IT - Správa', value: 2 },
+        { label: 'IT - Služby', value: 3 },
+        { label: 'IT - Vývoj webových stránek', value: 4 },
+        { label: 'IT - jiné', value: 5 },
+        { label: 'Bezpečnost', value: 10 },
+        { label: 'Cestovní ruch – volný čas', value: 11 },
+        { label: 'Doprava', value: 12 },
+        { label: 'Ekologie', value: 13 },
+        { label: 'Energetika', value: 14 },
+        { label: 'Finančnictví', value: 15 },
+        { label: 'Hornická činnost a činnosti obdobné', value: 16 },
+        { label: 'Kultura', value: 17 },
+        { label: 'Metrologie, zkušebnictví a technická normalizace', value: 18 },
+        { label: 'Osobní služby', value: 19 },
+        { label: 'Ostatní služby', value: 20 },
+        { label: 'Potravinářství', value: 21 },
+        { label: 'Právní služby', value: 22 },
+        { label: 'Řemeslné činnosti', value: 23 },
+        { label: 'Sociální služby', value: 24 },
+        { label: 'Stavebnictví', value: 25 },
+        { label: 'Technické služby', value: 26 },
+        { label: 'Veterinární služby a zvířata', value: 27 },
+        { label: 'Vzdělávání', value: 28 },
+        { label: 'Zdravotnictví', value: 29 },
+        { label: 'Zemědělství', value: 30 },
     ];
 
     $scope.company_sizes = [
@@ -141,4 +166,35 @@ function QuestionnaireBasicCtrl($scope, $http) {
         //console.log(oldValue);
         $scope.store();
     }, true);
+
+
+    $scope.fillByCompany = function (type, company) {
+        $scope.questionnaire.company_ic = company.ic;
+        $scope.questionnaire.company_name = company.name;
+        $scope.questionnaire.company_size = company.size;
+        $scope.questionnaire.company_address_city = company.address_city;
+        $scope.questionnaire.company_address_street = company.address_street;
+        $scope.questionnaire.company_address_postcode = company.address_postcode;
+        $scope.whisperer[type] = [];
+    };
+
+    $scope.whisperer = {};
+    $scope.whisper = function (type, model) {
+        if (typeof model === 'undefined' || !model || !$scope.whisperAllowed[type])
+            $scope.whisperer[type] = [];
+        else
+            $scope.whisperer[type] = [{ name: 'loading... (for '+model+')' }];
+
+        $http.post($scope.whisperCompanyUrl, {
+            model: model
+        })
+            .success(function (resp) {
+                if (!$scope.whisperAllowed[type])
+                    return $scope.whisperer[type] = [];
+                $scope.whisperer[type] = resp.whisperer;
+            })
+            .error(function (resp) {
+                $scope.whisperer[type] = [];
+            });
+    };
 }

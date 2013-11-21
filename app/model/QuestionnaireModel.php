@@ -35,6 +35,21 @@ class QuestionnaireModel {
         return $questionnaire;
     }
 
+    public function getCompaniesByName($name) {return array(array('name' => 'Zapakatel', 'ic' => '342423'));
+        $companies = $this->selectionFactory->table('company')
+            ->where('LOWER(name) LIKE ?', '%'.strtolower($name).'%')
+            ->fetchAll();
+        if (!$companies)
+            return array();
+
+        $companiesArray = array();
+        foreach ($companies as $company) {
+            $companiesArray[] = $company;
+        }
+
+        return $companiesArray;
+    }
+
     protected function prepareData($post) {
         $data = array(
             'sector' => @$post['sector']['value'],

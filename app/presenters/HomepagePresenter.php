@@ -28,6 +28,15 @@ class HomepagePresenter extends BasePresenter
         $this->sendJson($post);
     }
 
+    public function handleWhisperCompanies() {
+        $post = $this->getRawPost();
+        $model = isset($post['model']) ?$post['model'] :'';
+        $companies = $this->questionnaireModel->getCompaniesByName($model);
+        $this->sendJson(array(
+            'whisperer' => $companies
+        ));
+    }
+
     protected function getUid() {
         $section = $this->session->getSection('questionnaire');
         if (!isset($section['uid'])) {
