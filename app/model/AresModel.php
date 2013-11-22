@@ -96,25 +96,28 @@ class AresModel {
         if (!$records) {
             Debugger::log('Nebyly nalezeny záznamyve správné struktuře v XML', Debugger::ERROR);
             return array();
-        }Debugger::log($records);
+        }
+
+        // pokud pouze jedna odpoved
+        if ($xml['are:Ares_odpovedi']['are:Odpoved']['are:Pocet_zaznamu'] == 1)
+            $records = array($records);
 
         $companies = array();
         foreach ($records as $record) {
             $address = isset($record['are:Identifikace'])
-                    && is_array($record['are:Identifikace'])
-                    && isset($record['are:Identifikace']['are:Adresa_ARES']['dtt:Nazev_okresu'])
-                ?$record['are:Identifikace']['are:Adresa_ARES']
-                :array('dtt:Nazev_okresu' => '', 'dtt:Nazev_obce' => '', 'dtt:Nazev_casti_obce' => ''
-                    , 'dtt:Nazev_ulice' => '', 'dtt:Cislo_domovni' => '', 'dtt:Cislo_orientacni' => ''
-                    , 'dtt:PSC' => '');
-
+                && is_array($record['are:Identifikace'])
+                && isset($record['are:Identifikace']['are:Adresa_ARES']['dtt:Nazev_okresu'])
+            ?$record['are:Identifikace']['are:Adresa_ARES']
+            :array('dtt:Nazev_okresu' => '', 'dtt:Nazev_obce' => '', 'dtt:Nazev_casti_obce' => ''
+                , 'dtt:Nazev_ulice' => '', 'dtt:Cislo_domovni' => '', 'dtt:Cislo_orientacni' => ''
+                , 'dtt:PSC' => '');
             $company = array(
                 'ic' => isset($record['are:ICO']) ?$record['are:ICO'] :'',
                 'name' => isset($record['are:Obchodni_firma']) ?$record['are:Obchodni_firma'] :'',
-                'size' => '',
-                'address_city' => $address['dtt:Nazev_okresu'].' - '.$address['dtt:Nazev_obce'].' - '.$address['dtt:Nazev_casti_obce'],
-                'address_street' => $address['dtt:Nazev_ulice'].' '.$address['dtt:Cislo_domovni'].'/'.$address['dtt:Cislo_orientacni'],
-                'address_postcode' => $address['dtt:PSC'],
+                'size' => null,
+                'address_city' => @$address['dtt:Nazev_okresu'].' - '.@$address['dtt:Nazev_obce'].' - '.@$address['dtt:Nazev_casti_obce'],
+                'address_street' => @$address['dtt:Nazev_ulice'].' '.@$address['dtt:Cislo_domovni'].'/'.@$address['dtt:Cislo_orientacni'],
+                'address_postcode' => @$address['dtt:PSC'],
             );
             $companies[$this->hash($company)] = $company;
         }

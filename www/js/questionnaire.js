@@ -7,7 +7,7 @@ questionnaire.filter('round', function () {
     };
 });
 
-function QuestionnaireBasicCtrl($scope, $http, $q) {
+function QuestionnaireBasicCtrl($scope, $http, $q, $timeout) {
     // urls
     $scope.saveUrl = '/';
     $scope.storeUrl = '/';
@@ -187,27 +187,38 @@ function QuestionnaireBasicCtrl($scope, $http, $q) {
 
     // whisper
     var whispererCancler = $q.defer();
+    var whispererTimer = $timeout(function () {}, 1);
     $scope.whisperer = {};
     $scope.whisper = function (type, model) {
-        whispererCancler.resolve();
-        whispererCancler = $q.defer()
-        if (typeof model === 'undefined' || !model || !$scope.whisperAllowed[type])
-            $scope.whisperer[type] = [];
-        else
-            $scope.whisperer[type] = [{ name: 'loading... (for '+model+')' }];
-
-        $http({method: 'POST', url: $scope.whisperCompanyUrl, data: {
-            model: model
-        }, timeout: whispererCancler.promise})
-            .success(function (resp) {
-                if (!$scope.whisperAllowed[type]) {
-                    $scope.whisperer[type] = [];
-                    return;
-                }
-                $scope.whisperer[type] = resp.whisperer;
-            })
-            .error(function (resp) {
+        $timeout.cancel(whispererTimer);
+        whispererTimer = $timeout(function () {
+            whispererCancler.resolve();
+            whispererCancler = $q.defer();
+            if (typeof model === 'undefined' || !model)
                 $scope.whisperer[type] = [];
-            });
+            else
+                $scope.whisperer[type] = [{ name: 'loading... (for '+model+')' }];
+
+            $http({method: 'POST', url: $scope.whisperCompanyUrl, data: {
+                model: model
+            }, timeout: whispererCancler.promise})
+                .success(function (resp) {
+                    $scope.whisperer[type] = resp.whisperer;
+                })
+                .error(function (resp) {
+                    //$scope.whisperer[type] = [];
+                });
+        }, 500);
     };
+
+
+    var stored = {};
+    $scope.store = function (name, value) {
+        if (typeof value !== 'undefined') {
+            $timeout(function () {
+                stored[name] = value;
+            }, 100);
+        }
+        return stored[name];
+    }
 }
