@@ -60,13 +60,13 @@
                                ng-required="true"
                                ng-model="questionnaire.company_name"
                                ng-change="whisper('company_name', questionnaire.company_name)"
-                               ng-focus="store('company_name',true)"
-                               ng-blur="store('company_name',false)"
+                               ng-focus="storeVar('company_name',true)"
+                               ng-blur="storeVar('company_name',false)"
                                />
                     </div>
                     {* našeptávání *}
                     <div class="col-sm-2"></div>
-                    <ul class="col-sm-10" ng-show="store('company_name')">
+                    <ul class="col-sm-10" ng-show="storeVar('company_name')">
                         <li ng-repeat="exp in whisperer.company_name">
                             <button class="btn btn-info btn-block"
                                ng-click="fillByCompany('company_name', exp)">

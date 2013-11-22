@@ -137,17 +137,22 @@ function QuestionnaireBasicCtrl($scope, $http, $q, $timeout) {
         return false;
     };
 
+
+    var storeTimer = $timeout(function () {}, 1);
     var storeCancler = $q.defer();
     $scope.store = function () {
-        storeCancler.resolve();
-        storeCancler = $q.defer();
-        var data = {
-            'questionnaire': $scope.questionnaire
-        };
-        $http({method: 'POST', url: $scope.storeUrl, data: data, timeout: storeCancler.promise})
-            .success(function (resp) {
-            //console.log(resp);
-        });
+        $timeout.cancel(storeTimer);
+        storeTimer = $timeout(function () {
+            storeCancler.resolve();
+            storeCancler = $q.defer();
+            var data = {
+                'questionnaire': $scope.questionnaire
+            };
+            $http({method: 'POST', url: $scope.storeUrl, data: data, timeout: storeCancler.promise})
+                .success(function (resp) {
+                //console.log(resp);
+            });
+        }, 500);
     };
 
     $scope.save = function () {
@@ -213,7 +218,7 @@ function QuestionnaireBasicCtrl($scope, $http, $q, $timeout) {
 
 
     var stored = {};
-    $scope.store = function (name, value) {
+    $scope.storeVar = function (name, value) {
         if (typeof value !== 'undefined') {
             $timeout(function () {
                 stored[name] = value;
