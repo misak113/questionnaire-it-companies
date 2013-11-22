@@ -18,6 +18,12 @@ class XmlHelper {
      * Examples: $array =  xml2array(file_get_contents('feed.xml'));
      *              $array =  xml2array(file_get_contents('feed.xml', 1, 'attribute'));
      */
+    public static function xml2array0($contents, $get_attributes=1, $priority = 'tag') {
+        $xml   = simplexml_load_string($contents);
+        $array = json_decode(json_encode((array) $xml), 1);
+        $array = array($xml->getName() => $array);
+        return $array;
+    }
     public static function xml2array($contents, $get_attributes=1, $priority = 'tag') {
         if(!$contents) return array();
 
