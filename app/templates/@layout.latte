@@ -30,6 +30,9 @@
 	{include #content}
 
 	{block scripts}
+    <!--[if lte IE 8]>
+    <script src="{$baseUrl}/js/json3.min.js"></script>
+    <![endif]-->
 	<script src="{$basePath}/js/jquery.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular.min.js"></script>

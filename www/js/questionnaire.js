@@ -75,7 +75,8 @@ function QuestionnaireBasicCtrl($scope, $http, $q, $timeout) {
     $scope.company_sizes = [
         { label: 'Drobné (do 9 zaměstnanců)', value: 1 },
         { label: 'Malá (10 až 49 zaměstnanců)', value: 2 },
-        { label: 'Střední (50 až 249 zaměstnanců)', value: 3 },
+        { label: 'Střední (50' +
+            ' až 249 zaměstnanců)', value: 3 },
         { label: 'Velká (od 250 zaměstnanců)', value: 4 }
     ];
 
